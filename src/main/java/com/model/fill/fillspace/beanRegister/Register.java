@@ -51,7 +51,7 @@ public class Register implements ImportSelector, ApplicationContextAware {
         // 初始化容量,防止使用时，无端扩容，增加等待时长
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         for (String modelPath : new ArrayList<>(Arrays.asList(Arrays.stream(
-                annotations.get(ModelScan.class).getStringArray("value"))
+                        annotations.get(ModelScan.class).getStringArray("value"))
                 .distinct()
                 .toArray(String[]::new))).toArray(new String[0])) {
             Enumeration<URL> resources = null;
@@ -187,16 +187,19 @@ public class Register implements ImportSelector, ApplicationContextAware {
                 Qualifier annotation = declaredField.getAnnotation(Qualifier.class);
                 if (annotation == null) {
                     setField.accept(declaredField);
+                    declaredField.setAccessible(false);
                     continue;
                 }
                 setFieldByName.accept(declaredField, annotation.value());
             } else {
                 Resource resource = declaredField.getAnnotation(Resource.class);
                 if (resource == null) {
+                    declaredField.setAccessible(false);
                     continue;
                 }
                 if (resource.name().isEmpty()) {
                     setField.accept(declaredField);
+                    declaredField.setAccessible(false);
                     continue;
                 }
                 setFieldByName.accept(declaredField, resource.name());
